@@ -14,7 +14,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(user?.username || "");
   const [showAddHabitForm, setShowAddHabitForm] = useState(false);
-  const [completedTodayHabit, setCompletedTodayHabit] = useState([]);
+  const [completedTodayHabits, setCompletedTodayHabits] = useState([]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -38,6 +38,11 @@ const Dashboard = () => {
       setHabits((prevHabits) =>
         prevHabits.map((habit) =>
           habit._id === updatedHabit._id ? updatedHabit : habit
+        )
+      );
+      setCompletedTodayHabits((prevCompletedTodayHabits) =>
+        prevCompletedTodayHabits.filter(
+          (habits) => habit._id !== updatedHabit._id
         )
       );
     } catch (err) {
@@ -68,9 +73,17 @@ const Dashboard = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        const allHabits = res.data;
+        const alreadyCompletedTodayHabits = allHabits.filter((habit) =>
+          habit.datesCompleted.some(
+            (date) =>
+              new Date(date).setHours(0, 0, 0, 0) ===
+              new Date().setHours(0, 0, 0, 0)
+          )
+        );
         setHabits(res.data);
+        setCompletedTodayHabits(alreadyCompletedTodayHabits);
         setLoading(false);
-        //const datesCompleted = setCompletedTodayHabit(habits.datesCompleted);
       } catch (err) {
         console.error("Authentication failed:", err.response?.data || err);
         localStorage.removeItem("token");
@@ -130,7 +143,17 @@ const Dashboard = () => {
             </button>
           </div>
           <HabitCard
+            cardlabel={"All Habits"}
+            cardDesc={"No habits found. Add your first one!"}
             habits={habits}
+            loading={loading}
+            toggleComplete={toggleComplete}
+            deleteHabit={deleteHabit}
+          />
+          <HabitCard
+            cardlabel={"Completed Habits"}
+            cardDesc={"Lets complete your first one"}
+            habits={completedTodayHabits}
             loading={loading}
             toggleComplete={toggleComplete}
             deleteHabit={deleteHabit}

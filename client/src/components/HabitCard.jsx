@@ -2,7 +2,14 @@ import { useState } from "react";
 import { FaPen } from "react-icons/fa";
 import { FaRegTrashAlt } from "react-icons/fa";
 
-const HabitCard = ({ habits = [], loading, toggleComplete, deleteHabit }) => {
+const HabitCard = ({
+  cardlabel,
+  cardDesc,
+  habits = [],
+  loading,
+  toggleComplete,
+  deleteHabit,
+}) => {
   const isCompletedToday = (datesCompleted) => {
     return datesCompleted.some(
       (date) =>
@@ -13,11 +20,11 @@ const HabitCard = ({ habits = [], loading, toggleComplete, deleteHabit }) => {
   return (
     <>
       <div className=" bg-[#fefefe] p-5">
-        <h1 className="text-3xl font-bold mb-4">Your Habits</h1>
+        <h1 className="text-3xl font-bold mb-4">{cardlabel}</h1>
         {loading ? (
           <p>Loading habits...</p>
         ) : habits.length === 0 ? (
-          <p>No habits found. Add your first one!</p>
+          <p>{cardDesc}</p>
         ) : (
           <div className="space-y-4">
             {habits.map((habit) => (
