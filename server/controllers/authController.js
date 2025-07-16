@@ -21,10 +21,15 @@ exports.registerUser = async (req, res) => {
     if (userExist)
       return res.status(400).json({ error: "User Email already exists" });
 
+    // const hashPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({ username, email, password });
     const userToken = generateJWTToken(user._id);
 
-    res.status(201).json({ user: { id: user._id, username, email }, token });
+    res.status(201).json({
+      user: { id: user._id, username: user.username, email: user.email },
+      token: userToken,
+    });
   } catch (err) {
     res.status(500).json({ error: "Registration Failed" });
   }
@@ -41,10 +46,12 @@ exports.loginUser = async (req, res) => {
 
     const token = generateJWTToken(user._id);
 
-    res
-      .status(200)
-      .json({ user: { id: user._id, username: user.username, email }, token });
+    res.status(200).json({
+      user: { id: user._id, username: user.username, email: user.email },
+      token,
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Login Failed" });
   }
 };
