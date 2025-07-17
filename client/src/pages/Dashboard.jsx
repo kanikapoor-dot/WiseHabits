@@ -35,16 +35,30 @@ const Dashboard = () => {
         }
       );
       const updatedHabit = res.data.habit;
+
+      const isTodayCompleted = updatedHabit.datesCompleted.some(
+        (date) =>
+          new Date(date).setHours(0, 0, 0, 0) ===
+          new Date().setHours(0, 0, 0, 0)
+      );
+
       setHabits((prevHabits) =>
         prevHabits.map((habit) =>
           habit._id === updatedHabit._id ? updatedHabit : habit
         )
       );
-      setCompletedTodayHabits((prevCompletedTodayHabits) =>
-        prevCompletedTodayHabits.filter(
-          (habits) => habit._id !== updatedHabit._id
-        )
-      );
+      setCompletedTodayHabits((prev) => {
+        if (isTodayCompleted) {
+          if (!prev.find((habit) => habit._id === updatedHabit._id))
+            return [...prev, updatedHabit];
+
+          return prev.map((h) =>
+            h._id === updatedHabit._id ? updatedHabit : h
+          );
+        } else {
+          return prev.filter((habit) => habit._id !== updatedHabit._id);
+        }
+      });
     } catch (err) {
       console.error("Toggle failed", err.response?.data || err);
     }
@@ -94,6 +108,17 @@ const Dashboard = () => {
 
     fetchHabits();
   }, [navigate]);
+  const day = new Date().getDay();
+  const weekday = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  let today = weekday[day];
 
   return (
     <>
@@ -104,8 +129,8 @@ const Dashboard = () => {
           habits={habits}
         />
       )}
-      <div className="flex w-min-full h-screen border-box">
-        <div className="w-[20%] bg-[#fefefe] flex flex-col items-center m-2">
+      <div className="flex w-full h-screen">
+        <div className="w-[20%] bg-[#fefefe] flex flex-col items-center h-full overflow-hidden">
           <p className="text-3xl ml-2 bg-clip-text bg-orange-500 text-transparent font-bold">
             WiseHabit
           </p>{" "}
@@ -125,25 +150,25 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="w-[50%] bg-[#ebecee] flex flex-col m-2">
-          <div className="bg-[#fefefe] mb-2 flex items-center justify-between p-2">
+        <div className="w-[60%] bg-[#ebecee] flex flex-col mx-2 h-full overflow-y-auto">
+          <div className="bg-[#fefefe] mb-2 flex items-center justify-between p-4">
             <div>
               <p className="text-gray-700">
-                <span className="text-black font-bold">Hi There,</span>{" "}
+                <span className="text-xl text-black font-bold">Hi There ,</span>{" "}
                 {username}
               </p>
-              <p className="text-xs text-gray-400">Welcome back</p>
+              <p className="text-xs text-gray-700">Welcome back</p>
             </div>
 
             <button
-              className="bg-orange-500 text-white p-2 rounded-xl flex items-center gap-1"
+              className="bg-orange-400 hover:shadow-md hover:bg-orange-500 text-white p-2 rounded-xl flex items-center gap-1 transition"
               onClick={() => setShowAddHabitForm(true)}
             >
               <FaPlus /> New Habit
             </button>
           </div>
           <HabitCard
-            cardlabel={"All Habits"}
+            cardlabel={`${today}`}
             cardDesc={"No habits found. Add your first one!"}
             habits={habits}
             loading={loading}
@@ -159,7 +184,7 @@ const Dashboard = () => {
             deleteHabit={deleteHabit}
           />
         </div>
-        <div className="w-[30%] bg-[#fefefe] flex items-center justify-center m-2">
+        <div className="w-[20%] bg-[#fefefe] flex items-center justify-center h-full overflow-hidden">
           30%
         </div>
       </div>
