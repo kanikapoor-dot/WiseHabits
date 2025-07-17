@@ -15,6 +15,8 @@ const Dashboard = () => {
   const [username, setUsername] = useState(user?.username || "");
   const [showAddHabitForm, setShowAddHabitForm] = useState(false);
   const [completedTodayHabits, setCompletedTodayHabits] = useState([]);
+  const [dailyHabits, setDailyHabits] = useState([]);
+  const [WeeklyHabits, setWeeklyHabits] = useState([]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -42,11 +44,15 @@ const Dashboard = () => {
           new Date().setHours(0, 0, 0, 0)
       );
 
-      setHabits((prevHabits) =>
-        prevHabits.map((habit) =>
+      const updatingHabit = (prev) =>
+        prev.map((habit) =>
           habit._id === updatedHabit._id ? updatedHabit : habit
-        )
-      );
+        );
+
+      setHabits(updatingHabit);
+      setDailyHabits(updatingHabit);
+      setWeeklyHabits(updatingHabit);
+
       setCompletedTodayHabits((prev) => {
         if (isTodayCompleted) {
           if (!prev.find((habit) => habit._id === updatedHabit._id))
@@ -87,7 +93,9 @@ const Dashboard = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+
         const allHabits = res.data;
+
         const alreadyCompletedTodayHabits = allHabits.filter((habit) =>
           habit.datesCompleted.some(
             (date) =>
@@ -95,7 +103,16 @@ const Dashboard = () => {
               new Date().setHours(0, 0, 0, 0)
           )
         );
+
+        const weekHabits = allHabits.filter(
+          (habit) => habit.frequency === "weekly"
+        );
+
+        const dailyHabit = allHabits.filter((h) => h.frequency === "daily");
+
         setHabits(res.data);
+        setDailyHabits(dailyHabit);
+        setWeeklyHabits(weekHabits);
         setCompletedTodayHabits(alreadyCompletedTodayHabits);
         setLoading(false);
       } catch (err) {
@@ -170,7 +187,15 @@ const Dashboard = () => {
           <HabitCard
             cardlabel={`${today}`}
             cardDesc={"No habits found. Add your first one!"}
-            habits={habits}
+            habits={dailyHabits}
+            loading={loading}
+            toggleComplete={toggleComplete}
+            deleteHabit={deleteHabit}
+          />
+          <HabitCard
+            cardlabel={"Weekly Habits"}
+            cardDesc={"No habits found. Add your first one!"}
+            habits={WeeklyHabits}
             loading={loading}
             toggleComplete={toggleComplete}
             deleteHabit={deleteHabit}
