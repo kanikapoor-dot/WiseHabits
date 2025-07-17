@@ -1,5 +1,4 @@
-import Navbar from "../components/Navbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import HabitCard from "../components/HabitCard";
@@ -8,15 +7,15 @@ import { FaPlus } from "react-icons/fa";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
 
   const [habits, setHabits] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState(user?.username || "");
+  const [username, setUsername] = useState(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    return user?.username || "Guest";
+  });
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [showAddHabitForm, setShowAddHabitForm] = useState(false);
-  const [completedTodayHabits, setCompletedTodayHabits] = useState([]);
-  const [dailyHabits, setDailyHabits] = useState([]);
-  const [WeeklyHabits, setWeeklyHabits] = useState([]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -24,96 +23,60 @@ const Dashboard = () => {
     navigate("/login");
   };
 
-  const toggleComplete = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await api.patch(
-        `/habits/${id}/toggle`,
-        {},
-        {
+  const toggleComplete = useCallback(
+    async (id) => {
+      try {
+        const res = await api.patch(
+          `/habits/${id}/toggle`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const updatedHabit = res.data.habit;
+
+        setHabits((prev) =>
+          prev.map((habit) =>
+            habit._id === updatedHabit._id ? updatedHabit : habit
+          )
+        );
+      } catch (err) {
+        console.error("Toggle failed", err.response?.data || err);
+      }
+    },
+    [token, setHabits]
+  );
+
+  const deleteHabit = useCallback(
+    async (id) => {
+      try {
+        const res = await api.delete(`/habits/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
-      );
-      const updatedHabit = res.data.habit;
-
-      const isTodayCompleted = updatedHabit.datesCompleted.some(
-        (date) =>
-          new Date(date).setHours(0, 0, 0, 0) ===
-          new Date().setHours(0, 0, 0, 0)
-      );
-
-      const updatingHabit = (prev) =>
-        prev.map((habit) =>
-          habit._id === updatedHabit._id ? updatedHabit : habit
+        });
+        setHabits((prevHabits) =>
+          prevHabits.filter((habit) => habit._id !== id)
         );
-
-      setHabits(updatingHabit);
-      setDailyHabits(updatingHabit);
-      setWeeklyHabits(updatingHabit);
-
-      setCompletedTodayHabits((prev) => {
-        if (isTodayCompleted) {
-          if (!prev.find((habit) => habit._id === updatedHabit._id))
-            return [...prev, updatedHabit];
-
-          return prev.map((h) =>
-            h._id === updatedHabit._id ? updatedHabit : h
-          );
-        } else {
-          return prev.filter((habit) => habit._id !== updatedHabit._id);
-        }
-      });
-    } catch (err) {
-      console.error("Toggle failed", err.response?.data || err);
-    }
-  };
-
-  const deleteHabit = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await api.delete(`/habits/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setHabits((prevHabits) => prevHabits.filter((habit) => habit._id !== id));
-    } catch (err) {
-      console.error("Habit Deletion failed", err.response?.data || err);
-    }
-  };
+      } catch (err) {
+        console.error("Habit Deletion failed", err.response?.data || err);
+      }
+    },
+    [token, setHabits]
+  );
 
   useEffect(() => {
     const fetchHabits = async () => {
       try {
-        const token = localStorage.getItem("token");
         const res = await api.get("/habits", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        const allHabits = res.data;
-
-        const alreadyCompletedTodayHabits = allHabits.filter((habit) =>
-          habit.datesCompleted.some(
-            (date) =>
-              new Date(date).setHours(0, 0, 0, 0) ===
-              new Date().setHours(0, 0, 0, 0)
-          )
-        );
-
-        const weekHabits = allHabits.filter(
-          (habit) => habit.frequency === "weekly"
-        );
-
-        const dailyHabit = allHabits.filter((h) => h.frequency === "daily");
-
         setHabits(res.data);
-        setDailyHabits(dailyHabit);
-        setWeeklyHabits(weekHabits);
-        setCompletedTodayHabits(alreadyCompletedTodayHabits);
         setLoading(false);
       } catch (err) {
         console.error("Authentication failed:", err.response?.data || err);
@@ -137,6 +100,15 @@ const Dashboard = () => {
   ];
   let today = weekday[day];
 
+  const isSameDay = (a, b) =>
+    new Date(a).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0);
+
+  const dailyHabits = habits.filter((h) => h.frequency === "daily");
+  const weeklyHabits = habits.filter((h) => h.frequency === "weekly");
+  const completedTodayHabits = habits.filter((habit) =>
+    habit.datesCompleted.some((date) => isSameDay(date, null))
+  );
+
   return (
     <>
       {showAddHabitForm && (
@@ -147,7 +119,7 @@ const Dashboard = () => {
         />
       )}
       <div className="flex w-full h-screen">
-        <div className="w-[20%] bg-[#fefefe] flex flex-col items-center h-full overflow-hidden">
+        <div className="w-1/5 bg-[#fefefe] flex flex-col items-center h-full overflow-hidden">
           <p className="text-3xl ml-2 bg-clip-text bg-orange-500 text-transparent font-bold">
             WiseHabit
           </p>{" "}
@@ -167,7 +139,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="w-[60%] bg-[#ebecee] flex flex-col mx-2 h-full overflow-y-auto">
+        <div className="w-3/5 bg-[#ebecee] flex flex-col mx-2 h-full overflow-y-auto">
           <div className="bg-[#fefefe] mb-2 flex items-center justify-between p-4">
             <div>
               <p className="text-gray-700">
@@ -191,14 +163,16 @@ const Dashboard = () => {
             loading={loading}
             toggleComplete={toggleComplete}
             deleteHabit={deleteHabit}
+            setHabits={setHabits}
           />
           <HabitCard
             cardlabel={"Weekly Habits"}
             cardDesc={"No habits found. Add your first one!"}
-            habits={WeeklyHabits}
+            habits={weeklyHabits}
             loading={loading}
             toggleComplete={toggleComplete}
             deleteHabit={deleteHabit}
+            setHabits={setHabits}
           />
           <HabitCard
             cardlabel={"Completed Habits"}
@@ -207,9 +181,10 @@ const Dashboard = () => {
             loading={loading}
             toggleComplete={toggleComplete}
             deleteHabit={deleteHabit}
+            setHabits={setHabits}
           />
         </div>
-        <div className="w-[20%] bg-[#fefefe] flex items-center justify-center h-full overflow-hidden">
+        <div className="w-1/5 bg-[#fefefe] flex items-center justify-center h-full overflow-hidden">
           30%
         </div>
       </div>

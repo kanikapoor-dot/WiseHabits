@@ -3,15 +3,20 @@ import { FaPen } from "react-icons/fa";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa";
 import { FaRegSmile } from "react-icons/fa";
+import EditHabit from "./EditHabit";
 
 const HabitCard = ({
   cardlabel,
   cardDesc,
   habits = [],
+  setHabits,
   loading,
   toggleComplete,
   deleteHabit,
 }) => {
+  const [showEditHabitForm, setShowEditHabitForm] = useState(false);
+  const [passEditingHabit, setPassEditingHabit] = useState(null);
+
   const isCompletedToday = (datesCompleted) => {
     return datesCompleted.some(
       (date) =>
@@ -23,6 +28,12 @@ const HabitCard = ({
     month: "2-digit",
     year: "numeric",
   });
+
+  const startEdit = (habit) => {
+    setShowEditHabitForm(true);
+    setPassEditingHabit(habit);
+  };
+
   const isCompletedHabit = cardlabel === "Completed Habits" ? true : false;
   return (
     <>
@@ -77,7 +88,10 @@ const HabitCard = ({
                           className="accent-green-700"
                           onChange={() => toggleComplete(habit._id)}
                         />
-                        <button className="text-gray-500 hover:text-blue-500">
+                        <button
+                          className="text-gray-500 hover:text-blue-500"
+                          onClick={() => startEdit(habit)}
+                        >
                           <FaPen />
                         </button>
                         <button
@@ -100,6 +114,13 @@ const HabitCard = ({
           </div>
         )}
       </div>
+      {showEditHabitForm && (
+        <EditHabit
+          setHabits={setHabits}
+          setShowEditHabitForm={setShowEditHabitForm}
+          habit={passEditingHabit}
+        />
+      )}
     </>
   );
 };
