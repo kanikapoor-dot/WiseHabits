@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import HabitCard from "../components/HabitCard";
 import AddHabit from "../components/AddHabit";
 import { FaPlus } from "react-icons/fa";
+import { FaArrowCircleLeft } from "react-icons/fa";
+import { FaArrowCircleRight } from "react-icons/fa";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -88,6 +90,7 @@ const Dashboard = () => {
 
     fetchHabits();
   }, [navigate]);
+
   const day = new Date().getDay();
   const weekday = [
     "Sunday",
@@ -100,13 +103,29 @@ const Dashboard = () => {
   ];
   let today = weekday[day];
 
+  const date = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
   const isSameDay = (a, b) =>
     new Date(a).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0);
 
-  const dailyHabits = habits.filter((h) => h.frequency === "daily");
-  const weeklyHabits = habits.filter((h) => h.frequency === "weekly");
-  const completedTodayHabits = habits.filter((habit) =>
-    habit.datesCompleted.some((date) => isSameDay(date, null))
+  const dailyHabits = useMemo(
+    () => habits.filter((h) => h.frequency === "daily"),
+    [habits]
+  );
+  const weeklyHabits = useMemo(
+    () => habits.filter((h) => h.frequency === "weekly"),
+    [habits]
+  );
+  const completedTodayHabits = useMemo(
+    () =>
+      habits.filter((habit) =>
+        habit.datesCompleted.some((date) => isSameDay(date, null))
+      ),
+    [habits]
   );
 
   return (
@@ -118,8 +137,8 @@ const Dashboard = () => {
           habits={habits}
         />
       )}
-      <div className="flex w-full h-screen">
-        <div className="w-1/5 bg-[#fefefe] flex flex-col items-center h-full overflow-hidden">
+      <div className="flex w-full h-screen overflow-hidden p-1">
+        <div className="w-1/5 bg-[#fefefe] flex flex-col items-center h-full">
           <p className="text-3xl ml-2 bg-clip-text bg-orange-500 text-transparent font-bold">
             WiseHabit
           </p>{" "}
@@ -139,8 +158,8 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="w-3/5 bg-[#ebecee] flex flex-col mx-2 h-full overflow-y-auto">
-          <div className="bg-[#fefefe] mb-2 flex items-center justify-between p-4">
+        <div className="w-3/5 bg-[#ebecee] flex flex-col mx-2 h-full overflow-y-auto scrollbar-hide">
+          <div className="bg-[#fefefe] mb-1 flex items-center justify-between p-4 sticky top-0 z-20">
             <div>
               <p className="text-gray-700">
                 <span className="text-xl text-black font-bold">Hi There ,</span>{" "}
@@ -156,35 +175,52 @@ const Dashboard = () => {
               <FaPlus /> New Habit
             </button>
           </div>
-          <HabitCard
-            cardlabel={`${today}`}
-            cardDesc={"No habits found. Add your first one!"}
-            habits={dailyHabits}
-            loading={loading}
-            toggleComplete={toggleComplete}
-            deleteHabit={deleteHabit}
-            setHabits={setHabits}
-          />
-          <HabitCard
-            cardlabel={"Weekly Habits"}
-            cardDesc={"No habits found. Add your first one!"}
-            habits={weeklyHabits}
-            loading={loading}
-            toggleComplete={toggleComplete}
-            deleteHabit={deleteHabit}
-            setHabits={setHabits}
-          />
-          <HabitCard
-            cardlabel={"Completed Habits"}
-            cardDesc={"Lets complete your first one"}
-            habits={completedTodayHabits}
-            loading={loading}
-            toggleComplete={toggleComplete}
-            deleteHabit={deleteHabit}
-            setHabits={setHabits}
-          />
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between sticky top-[4.5rem] bg-[#fefefe] px-4 py-2 z-15 mb-1">
+              <div>
+                <p className="text-xl text-orange-700 font-semibold">{today}</p>
+                <p className="text-gray-500 text-sm ">{date}</p>
+              </div>
+              <div className="flex gap-3">
+                <button>
+                  <FaArrowCircleLeft className="text-orange-700" />
+                </button>
+                <button>
+                  <FaArrowCircleRight className="text-orange-700" />
+                </button>
+              </div>
+            </div>
+
+            <HabitCard
+              cardlabel={"Today Habits"}
+              cardDesc={"No habits found. Add your first one!"}
+              habits={dailyHabits}
+              loading={loading}
+              toggleComplete={toggleComplete}
+              deleteHabit={deleteHabit}
+              setHabits={setHabits}
+            />
+            <HabitCard
+              cardlabel={"Weekly Habits"}
+              cardDesc={"No habits found. Add your first one!"}
+              habits={weeklyHabits}
+              loading={loading}
+              toggleComplete={toggleComplete}
+              deleteHabit={deleteHabit}
+              setHabits={setHabits}
+            />
+            <HabitCard
+              cardlabel={"Completed Habits"}
+              cardDesc={"Lets complete your first one"}
+              habits={completedTodayHabits}
+              loading={loading}
+              toggleComplete={toggleComplete}
+              deleteHabit={deleteHabit}
+              setHabits={setHabits}
+            />
+          </div>
         </div>
-        <div className="w-1/5 bg-[#fefefe] flex items-center justify-center h-full overflow-hidden">
+        <div className="w-1/5 bg-[#fefefe] flex items-center justify-center h-full">
           30%
         </div>
       </div>

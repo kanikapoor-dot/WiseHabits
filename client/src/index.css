@@ -1,7 +1,14 @@
 @import "tailwindcss";
 
 #root {
-  padding: 5px;
-  box-sizing: border-box;
   background-color: #ebecee;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
