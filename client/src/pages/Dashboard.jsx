@@ -6,6 +6,8 @@ import AddHabit from "../components/AddHabit";
 import { FaPlus } from "react-icons/fa";
 import { FaArrowCircleLeft } from "react-icons/fa";
 import { FaArrowCircleRight } from "react-icons/fa";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -22,6 +24,11 @@ const Dashboard = () => {
     today.setHours(0, 0, 0, 0);
     return today;
   });
+
+  const getDateFromCalendar = (date) => {
+    date.setHours(0, 0, 0, 0);
+    setShowingDate(date);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -213,7 +220,7 @@ const Dashboard = () => {
         />
       )}
       <div className="flex w-full h-screen overflow-hidden p-1">
-        <div className="w-1/5 bg-mybg flex flex-col items-center h-full px-2 py-5">
+        <div className="w-0.7/5 bg-mybg flex flex-col items-center h-full px-2 py-5">
           <p className="text-3xl bg-clip-text bg-text1 text-transparent font-bold ">
             WiseHabit
           </p>{" "}
@@ -301,8 +308,14 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="w-1/5 bg-mybg flex items-center justify-center h-full">
-          30%
+        <div className="w-1.3/5 bg-mybg flex items-center justify-center h-full">
+          <div className="w-[90%]">
+            <Calendar
+              value={showingDate}
+              onChange={getDateFromCalendar}
+              className="react-calendar rounded-xl p-4 shadow-lg text-secondary h-[350px]"
+            />
+          </div>
         </div>
       </div>
     </>
