@@ -88,7 +88,8 @@ exports.deleteHabit = async (req, res) => {
 
 exports.toggleHabitComplete = async (req, res) => {
   const { id } = req.params;
-  const today = new Date().setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   try {
     const habit = await Habit.findById(id);
 
@@ -101,9 +102,11 @@ exports.toggleHabitComplete = async (req, res) => {
     const index = habit.datesCompleted.findIndex((date) => {
       const d = new Date(date);
       d.setHours(0, 0, 0, 0);
+      console.log(d.getTime);
+      console.log(today.getTime);
       return d.getTime === today.getTime;
     });
-
+    console.log(index);
     if (index !== -1) {
       habit.datesCompleted.splice(index, 1);
     } else {

@@ -148,12 +148,23 @@ const Dashboard = () => {
       newDate.setHours(0, 0, 0, 0);
       return newDate;
     });
-    console.log(showingDate);
+
+    const myHabits = habits;
+    console.log(date);
+    myHabits.map((habit) => {
+      console.log(habit.createdAt.split("T")[0]);
+      habit.datesCompleted.forEach((date) => console.log(date));
+    });
   };
 
-  const nextDayButtonvisible = () => {
+  const disableHabitBoard = () => {
     today.setHours(0, 0, 0, 0);
-    return showingDate === today ? true : false;
+    const showingCopy = new Date(showingDate);
+    showingCopy.setHours(0, 0, 0, 0);
+
+    return showingCopy.getTime() !== today.getTime()
+      ? "pointer-events-none opacity-50" // optional: faded effect
+      : "";
   };
 
   return (
@@ -215,43 +226,40 @@ const Dashboard = () => {
                 <button onClick={getPrevDateHabits}>
                   <FaArrowCircleLeft className="text-text1" />
                 </button>
-                <button
-                  onClick={getNextDateHabits}
-                  disabled={nextDayButtonvisible()}
-                  className=""
-                >
+                <button onClick={getNextDateHabits} className="">
                   <FaArrowCircleRight className="text-text1" />
                 </button>
               </div>
             </div>
-
-            <HabitCard
-              cardlabel={"Today Habits"}
-              cardDesc={"No habits found. Add your first one!"}
-              habits={dailyHabits}
-              loading={loading}
-              toggleComplete={toggleComplete}
-              deleteHabit={deleteHabit}
-              setHabits={setHabits}
-            />
-            <HabitCard
-              cardlabel={"Weekly Habits"}
-              cardDesc={"No habits found. Add your first one!"}
-              habits={weeklyHabits}
-              loading={loading}
-              toggleComplete={toggleComplete}
-              deleteHabit={deleteHabit}
-              setHabits={setHabits}
-            />
-            <HabitCard
-              cardlabel={"Completed Habits"}
-              cardDesc={"Lets complete your first one"}
-              habits={completedTodayHabits}
-              loading={loading}
-              toggleComplete={toggleComplete}
-              deleteHabit={deleteHabit}
-              setHabits={setHabits}
-            />
+            <div className={disableHabitBoard()}>
+              <HabitCard
+                cardlabel={"Today Habits"}
+                cardDesc={"No habits found. Add your first one!"}
+                habits={dailyHabits}
+                loading={loading}
+                toggleComplete={toggleComplete}
+                deleteHabit={deleteHabit}
+                setHabits={setHabits}
+              />
+              <HabitCard
+                cardlabel={"Weekly Habits"}
+                cardDesc={"No habits found. Add your first one!"}
+                habits={weeklyHabits}
+                loading={loading}
+                toggleComplete={toggleComplete}
+                deleteHabit={deleteHabit}
+                setHabits={setHabits}
+              />
+              <HabitCard
+                cardlabel={"Completed Habits"}
+                cardDesc={"Lets complete your first one"}
+                habits={completedTodayHabits}
+                loading={loading}
+                toggleComplete={toggleComplete}
+                deleteHabit={deleteHabit}
+                setHabits={setHabits}
+              />
+            </div>
           </div>
         </div>
         <div className="w-1/5 bg-mybg flex items-center justify-center h-full">
