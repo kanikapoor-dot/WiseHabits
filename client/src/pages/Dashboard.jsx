@@ -95,7 +95,6 @@ const Dashboard = () => {
     fetchHabits();
   }, [navigate]);
 
-  const day = new Date().getDay();
   const weekday = [
     "Sunday",
     "Monday",
@@ -105,31 +104,75 @@ const Dashboard = () => {
     "Friday",
     "Saturday",
   ];
-  let WeekdayName = weekday[day];
+  let WeekdayName = weekday[showingDate.getDay()];
 
-  const date = new Date().toLocaleDateString("en-GB", {
+  const date = showingDate.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
 
-  const isSameDay = (a, b) =>
-    new Date(a).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0);
+  const isSameDay = (a, b) => {
+    const x = new Date(a);
+    x.setUTCHours(0, 0, 0, 0);
+    const y = new Date(b);
+    y.setUTCHours(0, 0, 0, 0);
+    return x.getTime() === y.getTime();
+  };
+
+  const getWeekStart = (date) => {
+    const d = new Date(date);
+    d.setDate(d.getDate() - d.getDay());
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  const getWeekEnd = (date) => {
+    const d = new Date(date);
+    d.setDate(d.getDate() + (6 - d.getDay()));
+    d.setHours(23, 59, 59, 999);
+    return d;
+  };
 
   const dailyHabits = useMemo(
-    () => habits.filter((h) => h.frequency === "daily"),
-    [habits]
+    () =>
+      habits.filter((h) => {
+        return (
+          h.createdAt.split("T")[0] <=
+            showingDate.toLocaleDateString("en-CA") && h.frequency === "daily"
+        );
+      }),
+    [habits, showingDate]
   );
   const weeklyHabits = useMemo(
-    () => habits.filter((h) => h.frequency === "weekly"),
-    [habits]
+    () =>
+      habits.filter((h) => {
+        return (
+          h.createdAt.split("T")[0] <=
+            showingDate.toLocaleDateString("en-CA") && h.frequency === "weekly"
+        );
+      }),
+    [habits, showingDate]
   );
   const completedTodayHabits = useMemo(
     () =>
-      habits.filter((habit) =>
-        habit.datesCompleted.some((date) => isSameDay(date, null))
-      ),
-    [habits]
+      habits.filter((habit) => {
+        const weekStart = getWeekStart(showingDate);
+        const weekEnd = getWeekEnd(showingDate);
+        if (habit.frequency === "daily") {
+          return habit.datesCompleted.some((date) =>
+            isSameDay(date, showingDate)
+          );
+        }
+        if (habit.frequency === "weekly") {
+          return habit.datesCompleted.some((date) => {
+            const d = new Date(date);
+            return d >= weekStart && d <= weekEnd;
+          });
+        }
+        return false;
+      }),
+    [habits, showingDate]
   );
 
   const getPrevDateHabits = (e) => {
@@ -148,13 +191,6 @@ const Dashboard = () => {
       newDate.setHours(0, 0, 0, 0);
       return newDate;
     });
-
-    const myHabits = habits;
-    console.log(date);
-    myHabits.map((habit) => {
-      console.log(habit.createdAt.split("T")[0]);
-      habit.datesCompleted.forEach((date) => console.log(date));
-    });
   };
 
   const disableHabitBoard = () => {
@@ -163,7 +199,7 @@ const Dashboard = () => {
     showingCopy.setHours(0, 0, 0, 0);
 
     return showingCopy.getTime() !== today.getTime()
-      ? "pointer-events-none opacity-50" // optional: faded effect
+      ? "pointer-events-none opacity-50 select-none" // optional: faded effect
       : "";
   };
 
@@ -240,6 +276,7 @@ const Dashboard = () => {
                 toggleComplete={toggleComplete}
                 deleteHabit={deleteHabit}
                 setHabits={setHabits}
+                habitDate={showingDate}
               />
               <HabitCard
                 cardlabel={"Weekly Habits"}
@@ -249,6 +286,7 @@ const Dashboard = () => {
                 toggleComplete={toggleComplete}
                 deleteHabit={deleteHabit}
                 setHabits={setHabits}
+                habitDate={showingDate}
               />
               <HabitCard
                 cardlabel={"Completed Habits"}
@@ -258,6 +296,7 @@ const Dashboard = () => {
                 toggleComplete={toggleComplete}
                 deleteHabit={deleteHabit}
                 setHabits={setHabits}
+                habitDate={showingDate}
               />
             </div>
           </div>

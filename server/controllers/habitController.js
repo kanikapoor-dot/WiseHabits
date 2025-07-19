@@ -102,11 +102,8 @@ exports.toggleHabitComplete = async (req, res) => {
     const index = habit.datesCompleted.findIndex((date) => {
       const d = new Date(date);
       d.setHours(0, 0, 0, 0);
-      console.log(d.getTime);
-      console.log(today.getTime);
-      return d.getTime === today.getTime;
+      return d.getTime() === today.getTime();
     });
-    console.log(index);
     if (index !== -1) {
       habit.datesCompleted.splice(index, 1);
     } else {

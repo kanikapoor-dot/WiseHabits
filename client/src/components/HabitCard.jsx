@@ -13,15 +13,17 @@ const HabitCard = ({
   loading,
   toggleComplete,
   deleteHabit,
+  habitDate,
 }) => {
   const [showEditHabitForm, setShowEditHabitForm] = useState(false);
   const [passEditingHabit, setPassEditingHabit] = useState(null);
 
-  const isCompletedToday = (datesCompleted) => {
-    return datesCompleted.some(
-      (date) =>
-        new Date(date).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0)
-    );
+  const isCompletedToday = (datesCompleted, currentDay) => {
+    return datesCompleted.some((date) => {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime() === currentDay.getTime();
+    });
   };
 
   const startEdit = (habit) => {
@@ -30,6 +32,10 @@ const HabitCard = ({
   };
 
   const isCompletedHabit = cardlabel === "Completed Habits" ? true : false;
+  const itsToday = new Date();
+  itsToday.setHours(0, 0, 0, 0);
+  const isReadOnly =
+    !isCompletedHabit && new Date(habitDate).getTime() === itsToday.getTime();
   return (
     <>
       <div className="bg-mybg px-4 py-2.5">
@@ -79,11 +85,14 @@ const HabitCard = ({
                         </p>
                       </div>
                     </div>
-                    {!isCompletedHabit ? (
+                    {isReadOnly ? (
                       <div className="flex items-center ms-2 gap-5">
                         <input
                           type="checkbox"
-                          checked={isCompletedToday(habit.datesCompleted)}
+                          checked={isCompletedToday(
+                            habit.datesCompleted,
+                            habitDate
+                          )}
                           className="accent-green-700"
                           onChange={() => toggleComplete(habit._id)}
                         />
