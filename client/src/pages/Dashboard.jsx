@@ -230,14 +230,13 @@ const Dashboard = () => {
             >
               All habits
             </button>
-            <div className="self-center">
-              <button
-                onClick={handleLogout}
-                className={`hover:bg-text1 hover:text-white px-4 py-2 rounded-4xl transition`}
-              >
-                Logout
-              </button>
-            </div>
+            <hr className="w-[90%] wx-auto" />
+            <button
+              onClick={handleLogout}
+              className={`hover:bg-text1 hover:text-white px-4 py-2 rounded-4xl transition`}
+            >
+              Logout
+            </button>
           </div>
         </div>
         <div className="w-3/5 bg-[#d7daed] flex flex-col mx-2 h-full overflow-y-auto scrollbar-hide">

@@ -70,11 +70,10 @@ const AddHabit = ({ setHabits, setShowAddHabitForm, habits }) => {
           </div>
           <div className="flex flex-col gap-2">
             <label>Habit Description</label>{" "}
-            <input
-              type="text"
-              placeholder="description"
+            <textarea
+              placeholder="type your description here ..."
               value={description}
-              required
+              rows="4"
               className="border border-sm rounded-sm p-2"
               onChange={(e) => setDescription(e.target.value)}
             />
