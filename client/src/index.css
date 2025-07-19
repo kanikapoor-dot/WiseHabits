@@ -1,7 +1,15 @@
 @import "tailwindcss";
 
+@theme static {
+  --color-primary: #d66ec0;
+  --color-secondary: #5c64a2;
+  --color-text1: #8c5293;
+  --color-text2: #b184b7;
+  --color-mybg: #f0edf7;
+}
+
 #root {
-  background-color: #ebecee;
+  background-color: #d7daec;
 }
 
 .scrollbar-hide::-webkit-scrollbar {

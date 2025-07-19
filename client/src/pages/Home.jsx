@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 
 const Home = () => {
   return (
-    <div className="bg-linear-[30deg,#D66EC0,#5C64A2] min-h-screen px-5 py-5">
+    <div className="bg-linear-to-bl from-primary to-secondary min-h-screen px-5 py-5">
       <Navbar />
       <div className="p-10 text-white text-center flex flex-col justify-between">
         <div className="inline-block self-center p-5">

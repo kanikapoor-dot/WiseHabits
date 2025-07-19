@@ -32,12 +32,10 @@ const HabitCard = ({
   const isCompletedHabit = cardlabel === "Completed Habits" ? true : false;
   return (
     <>
-      <div className="bg-[#fefefe] px-4 py-2.5">
-        <div className="bg-[#fefefe] sticky top-[8rem] z-10 mb-5">
+      <div className="bg-mybg px-4 py-2.5">
+        <div className="bg-mybg sticky top-[8rem] z-10 mb-5">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl text-orange-900 font-semibold">
-              {cardlabel}
-            </h1>
+            <h1 className="text-2xl text-text1 font-semibold">{cardlabel}</h1>
             <p className="text-gray-500 text-sm">
               No of {cardlabel} : {habits.length}
             </p>
@@ -55,10 +53,10 @@ const HabitCard = ({
               <div
                 key={habit._id}
                 id={habit._id}
-                className="flex justify-between items-center bg-[#eff2f7] hover:shadow-md p-2 rounded"
+                className="flex justify-between items-center bg-white hover:shadow-md p-2 rounded"
               >
                 <div
-                  className={`flex flex-col items-start gap-2 w-full${
+                  className={`flex flex-col items-start gap-2 w-full ${
                     isCompletedHabit
                       ? "pointer-events-none opacity-80 focus:outline-none select-none"
                       : ""
@@ -67,9 +65,9 @@ const HabitCard = ({
                   <div className="flex items-center justify-between w-full">
                     <div className="flex">
                       {!isCompletedHabit ? (
-                        <FaRegClock className=" rounded-full bg-orange-400 text-white w-10 h-10 p-2 me-2" />
+                        <FaRegClock className=" rounded-full bg-text1 text-white w-8 h-8 p-2 me-2" />
                       ) : (
-                        <FaRegSmile className=" rounded-full bg-orange-400 text-white w-10 h-10 p-2 me-2" />
+                        <FaRegSmile className=" rounded-full bg-text1 text-white w-8 h-8 p-2 me-2" />
                       )}
 
                       <div>
@@ -106,7 +104,7 @@ const HabitCard = ({
                       ""
                     )}
                   </div>
-                  <p className="text-gray-600 bg-orange-300/70 p-2 text-xs break-all rounded-sm shadow-sm w-full">
+                  <p className="text-gray-600 bg-text2/50 p-2 text-xs break-all rounded-sm shadow-sm w-full">
                     {habit.description}
                   </p>
                 </div>

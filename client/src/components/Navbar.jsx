@@ -6,17 +6,8 @@ const Navbar = () => {
   const showLogin = currentPath !== "/login";
   const showRegister = currentPath !== "/register";
 
-  let gradientColor = "bg-linear-[30deg,#D66EC0,#5C64A2]";
-  let gradientHoverBg = "hover:bg-linear-[30deg,#D66EC0,#5C64A2]";
-
-  if (!showLogin) {
-    gradientColor = "bg-linear-[30deg,#42e695,#3bb2b8]";
-    gradientHoverBg = "hover:bg-linear-[30deg,#42e695,#3bb2b8]";
-  }
-  if (!showRegister) {
-    gradientColor = "bg-linear-[30deg,#f54ea2,#ff7676]";
-    gradientHoverBg = "hover:bg-linear-[30deg,#f54ea2,#ff7676]";
-  }
+  let gradientColor = "bg-linear-to-bl from-primary to-secondary";
+  let gradientHoverBg = "hover:bg-linear-to-bl from-primary to-secondary";
 
   return (
     <nav className=" shadow bg-white mb-5 p-2 flex justify-between items-center">

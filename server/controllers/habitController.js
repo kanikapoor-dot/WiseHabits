@@ -99,31 +99,25 @@ exports.toggleHabitComplete = async (req, res) => {
     }
 
     const index = habit.datesCompleted.findIndex((date) => {
-      return new Date(date).setHours(0, 0, 0, 0);
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime === today.getTime;
     });
 
     if (index !== -1) {
       habit.datesCompleted.splice(index, 1);
-      await habit.save();
-      return res.status(200).json({
-        message: "Habit unmarked for today",
-        habit,
-      });
     } else {
-      habit.datesCompleted.push(new Date());
-      await habit.save();
-      return res.status(200).json({
-        message: "Habit marked complete for today",
-        habit,
-      });
+      habit.datesCompleted.push(today);
     }
-
-    habit.datesCompleted.push(new Date());
     await habit.save();
 
-    res
-      .status(200)
-      .json({ message: "Habit marked completed for today", habit });
+    res.status(200).json({
+      message:
+        index !== -1
+          ? "Habit unmarked for today"
+          : "Habit marked complete for today",
+      habit,
+    });
   } catch (err) {
     console.error("Error marking habit complete:", err);
     res.status(500).json({ error: "Failed to mark habit complete" });

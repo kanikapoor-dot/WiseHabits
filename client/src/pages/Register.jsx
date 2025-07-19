@@ -37,14 +37,14 @@ const Register = () => {
   };
 
   return (
-    <div className="bg-linear-[30deg,#f54ea2,#ff7676] min-h-screen p-5 rounded-3xl">
+    <div className="bg-linear-to-bl from-primary to-secondary min-h-screen p-5">
       <Navbar />
       <form
         className="flex items-center justify-center"
         onSubmit={handleSubmit}
       >
         <div className="w-xl bg-white p-10 flex flex-col gap-10">
-          <p className="text-4xl text-[#ff7676] self-center">Register</p>
+          <p className="text-4xl text-text1 self-center">Register</p>
           <div className="flex gap-2 flex-col ">
             <label className="pl-1">Username</label>
             <input
@@ -52,6 +52,7 @@ const Register = () => {
               placeholder="Username"
               value={username}
               required
+              autoFocus
               className="border border-gray-400 rounded-xl px-5 py-2.5"
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -76,6 +77,7 @@ const Register = () => {
               minLength={6}
               placeholder="Password"
               required
+              autoFocus
               className="border border-gray-400 rounded-xl px-5 py-2.5"
               onChange={(e) => setPassword(e.target.value)}
             />

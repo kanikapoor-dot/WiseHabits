@@ -65,6 +65,7 @@ const EditHabit = ({ setHabits, setShowEditHabitForm, habit }) => {
               placeholder="Habit Name"
               value={name}
               required
+              autoFocus
               className="border border-sm rounded-sm p-2"
               onChange={(e) => setName(e.target.value)}
             />
@@ -86,7 +87,7 @@ const EditHabit = ({ setHabits, setShowEditHabitForm, habit }) => {
               <button
                 type="button"
                 className={`border px-2.5 py-2 rounded text-white ${
-                  frequency === "daily" ? "bg-orange-500" : "bg-gray-400"
+                  frequency === "daily" ? "bg-text2" : "bg-gray-400"
                 }`}
                 onClick={(e) => setFrequency("daily")}
               >
@@ -95,7 +96,7 @@ const EditHabit = ({ setHabits, setShowEditHabitForm, habit }) => {
               <button
                 type="button"
                 className={`border px-2.5 py-2 rounded text-white ${
-                  frequency === "weekly" ? "bg-orange-500 " : "bg-gray-400"
+                  frequency === "weekly" ? "bg-text2 " : "bg-gray-400"
                 }`}
                 onClick={(e) => setFrequency("weekly")}
               >
@@ -107,7 +108,7 @@ const EditHabit = ({ setHabits, setShowEditHabitForm, habit }) => {
           <button
             type="submit"
             disabled={updating}
-            className="bg-orange-500 rounded-xl text-white p-2 self-center"
+            className="bg-text1 rounded-xl text-white p-2 self-center"
           >
             {updating ? "Saving Changes..." : "Save Changes"}
           </button>
